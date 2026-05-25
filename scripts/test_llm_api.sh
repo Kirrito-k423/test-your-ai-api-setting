@@ -6,12 +6,17 @@ NETWORK_FAILURES=0
 API_WARNINGS=0
 PASSED=0
 SKIPPED=0
+CURL_EXTRA_ARGS=()
 
 if [[ -f "$ENV_FILE" ]]; then
   set -a
   # shellcheck disable=SC1090
   source "$ENV_FILE"
   set +a
+fi
+
+if [[ "${OS:-}" == "Windows_NT" ]]; then
+  CURL_EXTRA_ARGS+=(--ssl-no-revoke)
 fi
 
 require_cmd() {
@@ -78,6 +83,7 @@ test_openai_compatible_models() {
   local http_code
   http_code="$(
     curl -sS \
+      "${CURL_EXTRA_ARGS[@]}" \
       --connect-timeout 10 \
       --max-time 35 \
       -o "$response_file" \
@@ -140,6 +146,7 @@ EOF
   local http_code
   http_code="$(
     curl -sS \
+      "${CURL_EXTRA_ARGS[@]}" \
       --connect-timeout 10 \
       --max-time 35 \
       -o "$response_file" \
