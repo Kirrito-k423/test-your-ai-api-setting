@@ -70,7 +70,7 @@ function Test-OpenAICompatibleModels {
   )
 
   if ([string]::IsNullOrWhiteSpace($BaseUrl) -or [string]::IsNullOrWhiteSpace($ApiKey)) {
-    Write-Host "[SKIP] $Name: missing base url or api key."
+    Write-Host ("[SKIP] {0}: missing base url or api key." -f $Name)
     $script:Skipped++
     return
   }
@@ -82,11 +82,11 @@ function Test-OpenAICompatibleModels {
   try {
     $resp = Invoke-RestMethod -Method Get -Uri $url -Headers $headers -TimeoutSec 35
     if ($null -ne $resp.data) {
-      Write-Host "[PASS] $Name: HTTP 200, models endpoint reachable."
+      Write-Host "[PASS] ${Name}: HTTP 200, models endpoint reachable."
       $script:Passes++
     }
     else {
-      Write-Host "[WARN] $Name: HTTP 200 but response does not include data."
+      Write-Host "[WARN] ${Name}: HTTP 200 but response does not include data."
       $script:Warnings++
     }
   }
@@ -105,7 +105,7 @@ function Test-OpenAICompatibleModels {
 
     if ($statusCode -match "^HTTP 4\d\d|^HTTP 5\d\d") {
       $script:Warnings++
-      Write-Host "[WARN] $Name: $statusCode (endpoint reachable, API rejected request)."
+      Write-Host "[WARN] ${Name}: $statusCode (endpoint reachable, API rejected request)."
       Write-Host "       response: $(Truncate-Text -Text $errorText)"
 
       if ($errorText -match "Settlement blocked|SETTLEMENT_UNKNOWN_MODEL") {
@@ -118,7 +118,7 @@ function Test-OpenAICompatibleModels {
     }
     else {
       $script:Failures++
-      Write-Host "[FAIL] $Name: $statusCode"
+      Write-Host "[FAIL] ${Name}: $statusCode"
       Write-Host "       response: $(Truncate-Text -Text $errorText)"
     }
   }
@@ -133,13 +133,13 @@ function Test-OpenAICompatibleChat {
   )
 
   if ([string]::IsNullOrWhiteSpace($BaseUrl) -or [string]::IsNullOrWhiteSpace($ApiKey)) {
-    Write-Host "[SKIP] $Name: missing base url or api key."
+    Write-Host ("[SKIP] {0}: missing base url or api key." -f $Name)
     $script:Skipped++
     return
   }
 
   if ([string]::IsNullOrWhiteSpace($Model)) {
-    Write-Host "[SKIP] $Name: missing model."
+    Write-Host ("[SKIP] {0}: missing model." -f $Name)
     $script:Skipped++
     return
   }
@@ -164,11 +164,11 @@ function Test-OpenAICompatibleChat {
   try {
     $resp = Invoke-RestMethod -Method Post -Uri $url -Headers $headers -Body $body -TimeoutSec 35
     if ($null -ne $resp.choices -or $null -ne $resp.id) {
-      Write-Host "[PASS] $Name: HTTP 200, chat completion endpoint reachable."
+      Write-Host "[PASS] ${Name}: HTTP 200, chat completion endpoint reachable."
       $script:Passes++
     }
     else {
-      Write-Host "[WARN] $Name: HTTP 200 but response is missing expected fields."
+      Write-Host "[WARN] ${Name}: HTTP 200 but response is missing expected fields."
       $script:Warnings++
     }
   }
@@ -187,7 +187,7 @@ function Test-OpenAICompatibleChat {
 
     if ($statusCode -match "^HTTP 4\d\d|^HTTP 5\d\d") {
       $script:Warnings++
-      Write-Host "[WARN] $Name: $statusCode (endpoint reachable, API rejected request)."
+      Write-Host "[WARN] ${Name}: $statusCode (endpoint reachable, API rejected request)."
       Write-Host "       response: $(Truncate-Text -Text $errorText)"
 
       if ($errorText -match "Settlement blocked|SETTLEMENT_UNKNOWN_MODEL") {
@@ -199,7 +199,7 @@ function Test-OpenAICompatibleChat {
     }
     else {
       $script:Failures++
-      Write-Host "[FAIL] $Name: $statusCode"
+      Write-Host "[FAIL] ${Name}: $statusCode"
       Write-Host "       response: $(Truncate-Text -Text $errorText)"
     }
   }
